@@ -1,13 +1,15 @@
 import { Box, Container, VStack, HStack, Text, Input, Button, Flex, Heading } from "@chakra-ui/react";
 import { useState } from "react";
+import { usePosts, useAddPost } from "../integrations/supabase";
 
 const Index = () => {
-  const [posts, setPosts] = useState([]);
+  const { data: posts, isLoading, isError } = usePosts();
+  const addPostMutation = useAddPost();
   const [newPost, setNewPost] = useState("");
 
   const handlePostSubmit = () => {
     if (newPost.trim() !== "") {
-      setPosts([...posts, newPost]);
+      addPostMutation.mutate({ name: "Anonymous", body: newPost, likes_count: 0 });
       setNewPost("");
     }
   };
@@ -19,12 +21,16 @@ const Index = () => {
       </Flex>
       <VStack spacing={4} align="stretch">
         <Box as="main" flex="1">
-          {posts.length === 0 ? (
+          {isLoading ? (
+            <Text>Loading posts...</Text>
+          ) : isError ? (
+            <Text>Error loading posts.</Text>
+          ) : posts.length === 0 ? (
             <Text>No posts yet. Be the first to post!</Text>
           ) : (
-            posts.map((post, index) => (
-              <Box key={index} p={4} shadow="md" borderWidth="1px" borderRadius="md">
-                <Text>{post}</Text>
+            posts.map((post) => (
+              <Box key={post.id} p={4} shadow="md" borderWidth="1px" borderRadius="md">
+                <Text>{post.body}</Text>
               </Box>
             ))
           )}
@@ -36,7 +42,7 @@ const Index = () => {
               onChange={(e) => setNewPost(e.target.value)}
               placeholder="Write your post here..."
             />
-            <Button type="submit" colorScheme="blue">Post</Button>
+            <Button type="submit" colorScheme="blue" isLoading={addPostMutation.isLoading}>Post</Button>
           </HStack>
         </Box>
       </VStack>
