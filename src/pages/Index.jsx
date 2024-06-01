@@ -1,6 +1,7 @@
 import { Box, Container, VStack, HStack, Text, Input, Button, Flex, Heading } from "@chakra-ui/react";
 import { useState } from "react";
 import { usePosts, useAddPost } from "../integrations/supabase";
+import Auth from "../components/Auth"; // Add this import
 
 const Index = () => {
   const { data: posts, isLoading, isError } = usePosts();
@@ -20,6 +21,7 @@ const Index = () => {
         <Heading size="lg">Public Post Board</Heading>
       </Flex>
       <VStack spacing={4} align="stretch">
+        <Auth /> {/* Add this component */}
         <Box as="main" flex="1">
           {isLoading ? (
             <Text>Loading posts...</Text>
